@@ -26,3 +26,10 @@ resource "azurerm_role_assignment" "user_access_admin" {
   role_definition_name = "User Access Administrator"
   principal_id         = var.target_principal_id
 }
+
+data "azurerm_client_config" "current" {}
+
+import {
+  to = azurerm_resource_group.rg-meghankulkarni-testpoc
+  id = "/subscriptions/${data.azurerm_client_config.current.subscription_id}/resourceGroups/${var.resource_group_name}"
+}
