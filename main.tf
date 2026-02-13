@@ -1,27 +1,28 @@
-variable "resource_group_name" {
-  description = "Name of the Azure Resource Group"
-  type        = string
-  # default     = "rg-ach-demo"
-  default = "rg-terraform-state"
-}
-
-variable "location" {
-  description = "Azure region where resources will be created"
-  type        = string
-  default     = "centralus"
-}
-
-variable "tags" {
-  description = "Tags to apply to all resources"
-  type        = map(string)
-  default = {
-    Environment = "Demo"
-    Purpose     = "ACH File Processing"
-    ManagedBy   = "Terraform"
+terraform {
+  required_version = ">= 1.0"
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "~> 3.0"
+    }
   }
 }
 
-variable "target_principal_id" {
-  description = "The Principal ID (Object ID) of the user, group, or service principal to assign the User Access Administrator role to."
-  type        = string
+provider "azurerm" {
+  features {}
+  use_oidc = true
+}
+
+# Resource Group
+resource "azurerm_resource_group" "rg-meghankulkarni-testpoc" {
+  name     = var.resource_group_name
+  location = var.location
+
+  tags = var.tags
+}
+
+resource "azurerm_role_assignment" "user_access_admin" {
+  scope                = azurerm_resource_group.rg-meghankulkarni-testpoc.id
+  role_definition_name = "User Access Administrator"
+  principal_id         = var.target_principal_id
 }
